@@ -49,6 +49,14 @@ Once new version would be detected changed would be pushed to new branch `{tool}
 
 ### Notifications
 
+To receive notifications, you need to generate slack webhook url and set is [env variable](#environment)
+
+It will be posting new release version with release notes as description
+
+Also might tag people/groups if you specify them in [config file](#config)
+
+> For group just write name, for users slack UserId is needed
+
 ## How to run
 
 - Clone repository
