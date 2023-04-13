@@ -120,6 +120,15 @@ spec:
           - name: versca
             image: my.registry/versca:latest
             imagePullPolicy: IfNotPresent
+            env:
+              - name: GIT_USERNAME
+                value:
+              - name: GIT_ACCESS_TOKEN
+                value:
+              - name: CONFIG_FILE
+                value:
+              - name: SLACK_WEBHOOK_URL
+                value:
           restartPolicy: OnFailure
 ```
 
