@@ -56,7 +56,7 @@ def read_yaml_path(tool: str, file_path: str, yaml_path: str) -> str:
         if path_counter == 0:
             version = data[yaml_path[path_counter]]
         else:
-            if type(version) is str:
+            if type(version) is dict:
                 version = version[yaml_path[path_counter]]
             elif type(version) is list:
                 version = version[int(list_idx)][yaml_path[path_counter]]
