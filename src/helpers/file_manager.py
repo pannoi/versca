@@ -8,6 +8,7 @@ logger = get_logger(__name__)
 def cleanup() -> None:
     """ Method to cleanup application filesystem after run. """
     retain = [
+        '.git',
         'src',
         'tests',
         'kubernetes',
