@@ -75,6 +75,7 @@ git clone https://github.com/pannoi/versca.git && cd versca
 | GIT_ACCESS_TOKEN  | Git access token for user authentication (R/W access to repository)                        | YES      | string |
 | CONFIG_FILE       | If you'd like to use custom config file name(Default: config.yaml in application root dir) | NO       | string |
 | SLACK_WEBHOOK_URL | Generated webhook by slack to send messages (if you'd like to receive notification)        | NO       | string |
+| GITHUB_TOKEN      | Generated Github token, to extends API quota (60 per hour => 5000 per hour)                | NO       | string |
 
 ### Local
   

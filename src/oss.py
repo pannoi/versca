@@ -1,5 +1,6 @@
 import requests
 
+from src.utils.environment import Environment
 from src.utils.logger import get_logger
 from src.utils.errors import OssFailedToGetReleaseNotes, OssFailedToGetVersion
 
@@ -7,6 +8,19 @@ logger = get_logger(__name__)
 
 class OSS():
     """ Class which refs to OSS projects to grab release info. """
+    def __init__(self) -> None:
+        if Environment.github_token:
+            self.headers = {
+                'Accept': 'application/vnd.github+json',
+                'Authorization': f'Bearer {Environment.github_token}',
+                'X-GitHub-Api-Version': '2022-11-28',
+            }
+        else:
+            self.headers = {
+                'Accept': 'application/vnd.github+json',
+                'X-GitHub-Api-Version': '2022-11-28',
+            }
+
     def check_version(self, repo: str) -> str:
         """
         Parameters:
@@ -16,16 +30,11 @@ class OSS():
         Raises:
             OssFailedToGetVersion: Raises when unable to capture published release version
         """
-        headers = {
-            'Accept': 'application/vnd.github+json',
-            'X-GitHub-Api-Version': '2022-11-28',
-        }
-
         repo = repo.replace('https://', '') if 'https://' in repo else repo
         repo = repo.replace('github.com/', '')
         url = f'https://api.github.com/repos/{repo}/releases/latest'
 
-        response = requests.get(url=url, headers=headers, timeout=120)
+        response = requests.get(url=url, headers=self.headers, timeout=120)
         if not response.ok:
             logger.error('Failed to request version from %s', url)
             logger.error(response.json())
@@ -55,7 +64,7 @@ class OSS():
         repo = repo.replace('github.com/', '')
         url = f'https://api.github.com/repos/{repo}/releases/latest'
 
-        response = requests.get(url=url, headers=headers, timeout=120)
+        response = requests.get(url=url, headers=self.headers, timeout=120)
         if not response.ok:
             logger.error('Failed to request version from %s', url)
             logger.error(response.json())
