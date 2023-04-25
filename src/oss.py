@@ -1,4 +1,5 @@
 import requests
+import base64
 
 from src.utils.environment import Environment
 from src.utils.logger import get_logger
@@ -43,8 +44,8 @@ class OSS():
             raise OssFailedToGetVersion(repo=repo)
 
         version = response.json()['name']
-        if " " in version:
-            version = version.split(" ")[0]
+        version = version.split(" ")[0]
+        version = version.split("-")[0]
 
         return str(version)
 
@@ -60,7 +61,30 @@ class OSS():
         Raises:
             OssFailedToGetChartVersion: Raised when failed to scrape chart file from github
         """
-        pass
+        repo = repo.replace('https://', '') if 'https://' in repo else repo
+        repo = repo.replace('github.com/', '')
+        url = f'https://api.github.com/repos/{repo}/contents/{chart}'
+
+        response = requests.get(url=url, headers=self.headers, timeout=120)
+        if not response.ok:
+            logger.error('Failed to requests chart content from %s', url)
+            logger.error(response.json())
+            raise OssFailedToGetChartVersion(repo=repo)
+
+        content = response.json()['content']
+        content = base64.b64decode(content)
+        content = str(content).split('\\n')
+
+        for el in content:
+            if 'version' in el:
+                version = el
+                break
+
+        version = version.split('version: ')[-1]
+        version = version.split(' ')[0]
+        version = version.split('-')[0]
+
+        return str(version)
 
     def get_release_notes(self, repo: str) -> str:
         """
@@ -73,11 +97,6 @@ class OSS():
         Raises:
             OssFailedToGetReleaseNotes: Raises when unable to capture published notes
         """
-        headers = {
-            'Accept': 'application/vnd.github+json',
-            'X-GitHub-Api-Version': '2022-11-28',
-        }
-
         repo = repo.replace('https://', '') if 'https://' in repo else repo
         repo = repo.replace('github.com/', '')
         url = f'https://api.github.com/repos/{repo}/releases/latest'
