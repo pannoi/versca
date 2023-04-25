@@ -84,7 +84,17 @@ class OssFailedToGetVersion(Exception):
         super().__init__(self.message)
     def __str__(self) -> str:
         return f'{self.message}{self.repo}'
-    
+   
+class OssFailedToGetChartVersion(Exception):
+    """ Failed to get chart version from oss project. """
+    def __init__(self, repo: str, message: str="Failed to get chart version from OSS project: ") -> None:
+        self.message = message
+        self.repo = repo
+        super().__init__(self.message)
+    def __str__(self) -> str:
+        return f'{self.message}{self.repo}'
+
+
 class OssFailedToGetReleaseNotes(Exception):
     """ Failed to get release notes from oss project. """
     def __init__(self, repo: str, message: str="Failed to get release notes from OSS project: ") -> None:

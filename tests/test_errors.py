@@ -67,6 +67,12 @@ def test_oss_failed_to_get_release_notes():
     
     assert "Failed to get release notes from OSS project: " in str(excinfo.value)
 
+def test_oss_failed_to_get_chart_version():
+    with pytest.raises(errors.OssFailedToGetChartVersion) as excinfo:
+        raise errors.OssFailedToGetChartVersion(repo='github.com')
+    
+    assert "Failed to get chart version from OSS project: " in str(excinfo.value)
+
 def test_mr_bot_not_supported_git_repository():
     with pytest.raises(errors.MrBotNotSupportedGitRepository) as excinfo:
         raise errors.MrBotNotSupportedGitRepository()
