@@ -5,6 +5,7 @@
 ### Added
     - Add support for scanning helm chart
     - Can provide GITHUB_TOKEN to extend api rate 60 => 5000 per hour
+    - Support for list indexes in yaml path
 
 ### Changed
     - Make some config fields optional (specified in readme)

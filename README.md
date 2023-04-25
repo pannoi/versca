@@ -34,6 +34,28 @@ prometheus: # Tool name
     - file: base/prometheus-prometheus.yaml # values.yaml file with specified version
       yamlPath: spec.version # Yaml path where version specified in file
 ```
+---
+__Example with Helm:__
+
+```yaml
+mimir:
+  github: https://github.com/grafana/mimir # Publich Tool repo
+  internalRepo: # Internal repo which contains some values.yaml file
+  helmChart: operations/helm/charts/mimir-distributed/Chart.yaml # Optional
+  slack:
+    enabled: true # If you'd like to receive some slack notification
+    tag: # Who tag in slack message (keep empty if noone tag: [])
+      - team # Slack group to tag 
+      - UXXXXXXX # Slack User Id to tag
+  autoMR:
+    enabled: true # Automatically create MR to masterBranch if new version is detected
+    masterBranch: main # To which branch create MR/PR if new version is detected
+    projectId: 00000000 # Mandatory for gitlab
+  chart: # Needed only if helmChart specified
+    - file: overlays/kustomization.yaml # File where is specified helm chart version
+      yamlPath: helmCharts[0].version # Yaml path to where is chart version specified
+```
+
 
 ### Auto MR/PR
 
@@ -129,6 +151,8 @@ spec:
               - name: CONFIG_FILE
                 value:
               - name: SLACK_WEBHOOK_URL
+                value:
+              - name: GITHUB_TOKEN
                 value:
           restartPolicy: OnFailure
 ```
