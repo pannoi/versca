@@ -23,6 +23,8 @@ class OSS():
 
     def check_version(self, repo: str) -> str:
         """
+        Check github latest published release
+
         Parameters:
             repo(str): OSS Project git repository to check
         Returns:
@@ -48,6 +50,8 @@ class OSS():
 
     def get_release_notes(self, repo: str) -> str:
         """
+        Returns as string scrapped release notes from github
+
         Parameters:
             repo(str): OSS Project git repository to check
         Returns:
