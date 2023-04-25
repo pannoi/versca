@@ -2,7 +2,7 @@ import requests
 
 from src.utils.environment import Environment
 from src.utils.logger import get_logger
-from src.utils.errors import OssFailedToGetReleaseNotes, OssFailedToGetVersion
+from src.utils.errors import OssFailedToGetReleaseNotes, OssFailedToGetVersion, OssFailedToGetChartVersion
 
 logger = get_logger(__name__)
 
@@ -47,6 +47,20 @@ class OSS():
             version = version.split(" ")[0]
 
         return str(version)
+
+    def check_chart_version(self, repo: str, chart: str) -> str:
+        """
+        Checks helm chart version from provided version path
+
+        Paramters:
+            tool(str): Oss repository url
+            chart(str): Path to helm chart file
+        Returns:
+            str: Scrapped helm chart version
+        Raises:
+            OssFailedToGetChartVersion: Raised when failed to scrape chart file from github
+        """
+        pass
 
     def get_release_notes(self, repo: str) -> str:
         """

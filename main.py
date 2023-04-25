@@ -26,16 +26,31 @@ def run_scirpt():
         logger.info('Checking versions for %s', data.keys())
 
         for key, val in data.items():
+            logger.info('Run version scan for %s', key)
             version_upgrade = False
+            chart_version_upgrade = False
             oss_version = oss.check_version(repo=val['github'])
             repo_manager.clone_repo(repo=val['internalRepo'], tool=key)
+            if 'helmChart' in val:
+                chart_oss_version = oss.check_chart_version(repo=val['github'], chart=val['helmChart'])
 
-            for version in val['version']:
-                local_version = yaml_helper.read_yaml_path(tool=key, file_path=version['file'], yaml_path=version['yamlPath'])
-                if oss_version != local_version:
-                    version_upgrade = True
-                    logger.info('Version upgrade detected: %s | %s => %s', key, local_version, oss_version)
-                yaml_helper.update_yaml_version(tool=key, file_path=version['file'], yaml_path=version['yamlPath'], new_version=oss_version)
+            if 'version' in val:
+                for version in val['version']:
+                    local_version = yaml_helper.read_yaml_path(tool=key, file_path=version['file'], yaml_path=version['yamlPath'])
+                    logger.info('Comparing version for %s: %s (local) | %s (public)', key, local_version, oss_version)
+                    if oss_version != local_version:
+                        version_upgrade = True
+                        logger.info('Version upgrade detected: %s | %s => %s', key, local_version, oss_version)
+                        yaml_helper.update_yaml_version(tool=key, file_path=version['file'], yaml_path=version['yamlPath'], new_version=oss_version)
+
+            if 'chart' in val:
+                for chart_version in val['chart']:
+                    chart_local_version = yaml_helper.read_yaml_path(tool=key, file_path=chart_version['file'], yaml_path=chart_version['yamlPath'])
+                    logger.info('Comparing chart versions for %s: %s (local) | %s (public)', key, chart_local_version, chart_oss_version)
+                    if chart_oss_version != chart_local_version:
+                        chart_version_upgrade = True
+                        logger.info('Helm chart version upgrade detected: %s | %s => %s', key, chart_local_version, chart_oss_version)
+                        yaml_helper.update_yaml_version(tool=key, file_path=chart_version['file'], yaml_path=chart_version['yamlPath'], new_version=chart_oss_version)
 
             if val['autoMR']['enabled'] and version_upgrade:
                 release_notes = oss.get_release_notes(repo=val['github'])
@@ -53,6 +68,25 @@ def run_scirpt():
                     dest_branch=val['autoMR']['masterBranch'],
                     old_version=local_version,
                     new_version=oss_version,
+                    notes=release_notes
+                )
+
+            if val['autoMR']['enabled'] and chart_version_upgrade:
+                release_notes = oss.get_release_notes(repo=val['github'])
+                branch = repo_manager.push_to_feature_branch(tool=key, old_version=chart_local_version, new_version=chart_oss_version)
+                project_id = val['autoMR']['projectId'] if val['autoMR']['projectId'] else ''
+                owner = val['autoMR']['owner'] if val['autoMR']['owner'] else ''
+                repo_name = val['autoMR']['repoName'] if val['autoMR']['repoName'] else ''
+                mr_url = mr_bot.create_merge_request(
+                    repo=val['internalRepo'],
+                    project_id=project_id,
+                    owner=owner,
+                    repo_name=repo_name,
+                    tool=key,
+                    src_branch=branch,
+                    dest_branch=val['autoMR']['masterBranch'],
+                    old_version=chart_local_version,
+                    new_version=chart_oss_version,
                     notes=release_notes
                 )
 
