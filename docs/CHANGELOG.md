@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.2.1] - 2023-04-26
+
+### Added
+
+### Changed
+
+### Fixed
+    - Changed hardcoded patterns to regexp
+    - Grab tag_name if release is None
+
 ## [0.2.0] - 2023-04-25
 
 ### Added

@@ -5,6 +5,8 @@ from src.utils.environment import Environment
 from src.utils.logger import get_logger
 from src.utils.errors import OssFailedToGetReleaseNotes, OssFailedToGetVersion, OssFailedToGetChartVersion
 
+from src.helpers import string_parser
+
 logger = get_logger(__name__)
 
 class OSS():
@@ -43,9 +45,8 @@ class OSS():
             logger.error(response.json())
             raise OssFailedToGetVersion(repo=repo)
 
-        version = response.json()['name']
-        version = version.split(" ")[0]
-        version = version.split("-")[0]
+        version = response.json()['name'] if response.json()['name'] is not None else response.json()['tag_name']
+        version = string_parser.version_pattern_parser(version=version)
 
         return str(version)
 
@@ -81,8 +82,7 @@ class OSS():
                 break
 
         version = version.split('version: ')[-1]
-        version = version.split(' ')[0]
-        version = version.split('-')[0]
+        version = string_parser.version_pattern_parser(version=version)
 
         return str(version)
 
