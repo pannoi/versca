@@ -13,6 +13,8 @@ class RepoManager():
     """ Local git repo manager. """
     def clone_repo(self, repo: str, tool: str) -> None:
         """
+        Clones repository to local file system
+
         Parameters:
             repo(str): Remote git origin repository to clone localy
             tool(str): Name of tool to name folder for cloning
@@ -33,6 +35,8 @@ class RepoManager():
 
     def push_to_feature_branch(self, tool: str, old_version: str, new_version: str) -> str:
         """
+        Pushes changes to newly created branch
+
         Parameters:
             tools(str): Name of tool to mention in branch name
             old_version(str): Old version which was declared in local repository

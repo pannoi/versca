@@ -39,7 +39,13 @@ def read_yaml_path(tool: str, file_path: str, yaml_path: str) -> str:
         str: Found current version of application
     Raises:
         YamlReadVersionError: Raises when unable to locate provided yaml_path in YAML file
+        ValueError: When provided not supoprted type in yamlPath (only str/list_idx)
     """
+    if '[' in yaml_path and ']' in yaml_path:
+        list_idx = yaml_path.split('[')[-1]
+        list_idx = list_idx.split(']')[0]
+        yaml_path = yaml_path.replace(f'[{list_idx}]', '')
+
     file_path = f'{os.getcwd()}/{tool}/{file_path}'
     yaml_path = yaml_path.split('.')
     path_counter = 0
@@ -50,7 +56,13 @@ def read_yaml_path(tool: str, file_path: str, yaml_path: str) -> str:
         if path_counter == 0:
             version = data[yaml_path[path_counter]]
         else:
-            version = version[yaml_path[path_counter]]
+            if type(version) is dict:
+                version = version[yaml_path[path_counter]]
+            elif type(version) is list:
+                version = version[int(list_idx)][yaml_path[path_counter]]
+            else:
+                logger.error('Not supported type in yaml path (only str/list): %s', str(type(version)))
+                raise ValueError('Not supported type in yaml path (only str/list): %s', str(type(version)))
         path_counter += 1
 
     if not str(version):
@@ -73,6 +85,12 @@ def update_yaml_version(tool: str, file_path: str, yaml_path: str, new_version: 
         YamlPathDepthError: Raises when yaml nested depth more than 5
         YamlUpdateFileError: Raises when unable to update YAML file
     """
+    list_idx = None
+    if '[' in yaml_path and ']' in yaml_path:
+        list_idx = yaml_path.split('[')[-1]
+        list_idx = list_idx.split(']')[0]
+        yaml_path = yaml_path.replace(f'[{list_idx}]', '')
+    
     file_name = f'{os.getcwd()}/{tool}/{file_path}'
     try:
         config, ind, bsi = ruamel.yaml.util.load_yaml_guess_indent(open(file_name, encoding='UTF-8'))
@@ -88,13 +106,25 @@ def update_yaml_version(tool: str, file_path: str, yaml_path: str, new_version: 
     if len(yaml_path) == 1:
         config.update(upd)
     elif len(yaml_path) == 2:
-        config[yaml_path[0]].update(upd)
+        if list_idx:
+            config[yaml_path[0]][int(list_idx)].update(upd)
+        else:
+            config[yaml_path[0]].update(upd)
     elif len(yaml_path) == 3:
-        config[yaml_path[0]][yaml_path[1]].update(upd)
+        if list_idx:
+            config[yaml_path[0]][yaml_path[1]][int(list_idx)].update(upd)
+        else:
+            config[yaml_path[0]][yaml_path[1]].update(upd)
     elif len(yaml_path) == 4:
-        config[yaml_path[0]][yaml_path[1]][yaml_path[2]].update(upd)
+        if list_idx:
+            config[yaml_path[0]][yaml_path[1]][yaml_path[2]][int(list_idx)].update(upd)
+        else:
+            config[yaml_path[0]][yaml_path[1]][yaml_path[2]].update(upd)
     elif len(yaml_path) == 5:
-        config[yaml_path[0]][yaml_path[1]][yaml_path[2]][yaml_path[3]].update(upd)
+        if list_idx:
+            config[yaml_path[0]][yaml_path[1]][yaml_path[2]][yaml_path[3]][int(list_idx)].update(upd)
+        else:
+            config[yaml_path[0]][yaml_path[1]][yaml_path[2]][yaml_path[3]].update(upd)
     else:
         logger.error('Depth more than 6 nests is not supported')
         raise YamlPathDepthError(depth=len(yaml_path))
