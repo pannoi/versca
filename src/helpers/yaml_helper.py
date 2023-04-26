@@ -74,7 +74,7 @@ def read_yaml_path(tool: str, file_path: str, yaml_path: str, helper: bool = Fal
 
     return str(version) if helper else str(string_parser.version_pattern_parser(version=version))
 
-def update_yaml_version(tool: str, file_path: str, yaml_path: str, new_version: str) -> None:
+def update_yaml_version(tool: str, file_path: str, yaml_path: str, new_version: str, prefix: str = '') -> None:
     """
     Update YAML version based on provided path
 
@@ -83,6 +83,7 @@ def update_yaml_version(tool: str, file_path: str, yaml_path: str, new_version: 
         file_path(str): File path to lookup in tool directory
         yaml_path(str): Provided YAML path to update
         new_version(str): New version to which update yaml_path
+        prefix(str): If any prefix should be added before version, usualy docker image (Default: '')
     Raises:
         YamlReadFileError: Raises when unable to read YAML file
         YamlPathDepthError: Raises when yaml nested depth more than 5
@@ -104,7 +105,7 @@ def update_yaml_version(tool: str, file_path: str, yaml_path: str, new_version: 
 
     yaml_path = yaml_path.split('.')
 
-    upd = {yaml_path[-1]: new_version}
+    upd = {yaml_path[-1]: prefix + new_version}
 
     if len(yaml_path) == 1:
         config.update(upd)
