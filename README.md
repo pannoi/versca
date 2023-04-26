@@ -27,7 +27,7 @@ prometheus: # Tool name
   autoMR:
     enabled: true # Automatically create MR to masterBranch if new version is detected
     masterBranch: main # To which branch create MR/PR if new version is detected
-    deleteBranch: true # Optional, set `true` if you'd like to delete src branch after merge (If not set => false)
+    deleteBranch: true # Optional, set `true` if you'd like to delete src branch after merge (If not set => false,)
     projectId: 00000000 # Mandatory for gitlab (Gitlab projectId)
     repoName: prometheus # Mandatory for github/bitbucket (repository name)
     owner: pannoi # Mandatory for github/bitbucket (Owner name: usually organisation)
@@ -35,6 +35,8 @@ prometheus: # Tool name
     - file: base/prometheus-prometheus.yaml # values.yaml file with specified version
       yamlPath: spec.version # Yaml path where version specified in file
 ```
+
+> Automatic deleteBranch not working for [github](https://github.com/) it should be configure in repostory settings to automatically delete branches after every PR
 ---
 __Example with Helm:__
 
