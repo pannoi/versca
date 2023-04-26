@@ -5,6 +5,8 @@ import ruamel.yaml
 from src.utils.logger import get_logger
 from src.utils.errors import YamlConvertError, YamlPathDepthError, YamlReadFileError, YamlUpdateFileError, YamlReadVersionError
 
+from src.helpers import string_parser
+
 logger = get_logger(__name__)
 
 def yaml_to_dict(file_path: str) -> dict:
@@ -27,7 +29,7 @@ def yaml_to_dict(file_path: str) -> dict:
             logger.error(err)
             raise YamlConvertError()
 
-def read_yaml_path(tool: str, file_path: str, yaml_path: str) -> str:
+def read_yaml_path(tool: str, file_path: str, yaml_path: str, helper: bool = False) -> str:
     """
     Read YAML version based on provided path
 
@@ -35,6 +37,7 @@ def read_yaml_path(tool: str, file_path: str, yaml_path: str) -> str:
         tool(str): Name of tool to specify as folder in path
         file_path(str): File path to lookup in tool directory
         yaml_path(str): Provided yaml path to read version
+        helper(bool): If true returns version with prefixes and suffixes (Default: False)
     Returns:
         str: Found current version of application
     Raises:
@@ -69,7 +72,7 @@ def read_yaml_path(tool: str, file_path: str, yaml_path: str) -> str:
         logger.error('Cannot find version in provided YAML path: %s', yaml_path)
         raise YamlReadVersionError
 
-    return str(version)
+    return str(version) if helper else str(string_parser.version_pattern_parser(version=version))
 
 def update_yaml_version(tool: str, file_path: str, yaml_path: str, new_version: str) -> None:
     """
