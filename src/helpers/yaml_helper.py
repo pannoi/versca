@@ -129,6 +129,16 @@ def update_yaml_version(tool: str, file_path: str, yaml_path: str, new_version: 
             config[yaml_path[0]][yaml_path[1]][yaml_path[2]][yaml_path[3]][int(list_idx)].update(upd)
         else:
             config[yaml_path[0]][yaml_path[1]][yaml_path[2]][yaml_path[3]].update(upd)
+    elif len(yaml_path) == 6:
+        if list_idx:
+            config[yaml_path[0]][yaml_path[1]][yaml_path[2]][yaml_path[3]][yaml_path[4]][int(list_idx)].update(upd)
+        else:
+            config[yaml_path[0]][yaml_path[1]][yaml_path[2]][yaml_path[3]][yaml_path[4]].update(upd)
+    elif len(yaml_path) == 7:
+        if list_idx:
+            config[yaml_path[0]][yaml_path[1]][yaml_path[2]][yaml_path[3]][yaml_path[4]][yaml_path[5]][int(list_idx)].update(upd)
+        else:
+            config[yaml_path[0]][yaml_path[1]][yaml_path[2]][yaml_path[3]][yaml_path[4]][yaml_path[5]].update(upd)
     else:
         logger.error('Depth more than 6 nests is not supported')
         raise YamlPathDepthError(depth=len(yaml_path))
