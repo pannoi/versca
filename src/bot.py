@@ -18,7 +18,8 @@ class Bot():
                              dest_branch: str,
                              old_version: str,
                              new_version: str,
-                             notes: str) -> str:
+                             notes: str,
+                             delete_src_branch: bool) -> str:
         """
         Call propper MR creationg method in class based on repo url
 
@@ -33,6 +34,7 @@ class Bot():
             old_version(str): Old version which was detected in local repository
             new_version(str): New version which was scrapped from OSS project
             notes(str): Release notes from OSS project
+            delete_src_branch(bool): if True src branch checkbox would be enabled, else disabled
         Returns:
             str: Generated Merge Request url after webhook
         Raises:

@@ -57,6 +57,7 @@ def run_scirpt():
                         yaml_helper.update_yaml_version(tool=key, file_path=chart_version['file'], yaml_path=chart_version['yamlPath'], new_version=chart_oss_version)
 
             if val['autoMR']['enabled'] and version_upgrade:
+                delete_src_branch = False if 'deleteBranch' not in val['autoMR'] else val['autoMR']['deleteBranch']
                 release_notes = oss.get_release_notes(repo=val['github'])
                 branch = repo_manager.push_to_feature_branch(tool=key, old_version=local_version, new_version=oss_version)
                 project_id = val['autoMR']['projectId'] if val['autoMR']['projectId'] else ''
@@ -76,6 +77,7 @@ def run_scirpt():
                 )
 
             if val['autoMR']['enabled'] and chart_version_upgrade:
+                delete_src_branch = False if 'deleteBranch' not in val['autoMR'] else val['autoMR']['deleteBranch']
                 release_notes = oss.get_release_notes(repo=val['github'])
                 branch = repo_manager.push_to_feature_branch(tool=key, old_version=chart_local_version, new_version=chart_oss_version)
                 project_id = val['autoMR']['projectId'] if val['autoMR']['projectId'] else ''
