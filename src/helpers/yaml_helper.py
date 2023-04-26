@@ -61,8 +61,8 @@ def read_yaml_path(tool: str, file_path: str, yaml_path: str) -> str:
             elif type(version) is list:
                 version = version[int(list_idx)][yaml_path[path_counter]]
             else:
-                logger.error('Not supported type in yaml path (only str/list): %s', str(type(version)))
-                raise ValueError('Not supported type in yaml path (only str/list): %s', str(type(version)))
+                logger.error('Not supported type in yaml path (only dict/list): %s', str(type(version)))
+                raise ValueError('Not supported type in yaml path (only dict/list): %s', str(type(version)))
         path_counter += 1
 
     if not str(version):

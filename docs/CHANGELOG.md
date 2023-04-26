@@ -1,12 +1,13 @@
 # Changelog
 
-## [0.2.1] - 2023-04-27
+## [0.2.2] - 2023-04-27
 
 ### Added
 
 ### Changed
 
 ### Fixed
+  - Fix logging comments to proper datatypes
 
 ## [0.2.1] - 2023-04-26
 
