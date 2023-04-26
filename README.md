@@ -51,11 +51,36 @@ mimir:
     enabled: true # Automatically create MR to masterBranch if new version is detected
     masterBranch: main # To which branch create MR/PR if new version is detected
     projectId: 00000000 # Mandatory for gitlab
+    repoName: mimir # Mandatory for github/bitbucket (repository name)
+    owner: pannoi # Mandatory for github/bitbucket (Owner name: usually organisation)
   chart: # Needed only if helmChart specified
     - file: overlays/kustomization.yaml # File where is specified helm chart version
       yamlPath: helmCharts[0].version # Yaml path to where is chart version specified
 ```
+---
+__Example with Docker image:__
 
+```yaml
+grafana:
+  github: https://github.com/grafana/grafana # Publich Tool repo
+  internalRepo: # Internal repo which contains some values.yaml file
+  slack:
+    enabled: true
+    tag: # Who tag in slack message (keep empty if noone tag: [])
+      - team # Slack group to tag 
+      - UXXXXXXX # Slack User Id to tag
+  autoMR:
+    enabled: true # If you'd like to receive some slack notification
+    masterBranch: main # To which branch create MR/PR if new version is detected
+    projectId: 00000000 # Mandatory for gitlab
+    repoName: grafana # Mandatory for github/bitbucket (repository name)
+    owner: pannoi # Mandatory for github/bitbucket (Owner name: usually organisation)
+  version:
+    - file: base/grafana-deployment.yaml # values.yaml file with specified version
+      yamlPath: spec.template.spec.containers[0].image # Yaml path where version specified in file
+```
+
+> If version specified with prefix: grafana/grafana:0.0.0 => image: grafana/grafana:0.1.0 
 
 ### Auto MR/PR
 
@@ -114,6 +139,7 @@ docker run -it \
     -e GIT_USERNAME="" \
     -e CONFIG_FILE="config.yaml" \
     -e SLACK_WEBHOOK_URL="" \
+    -e GITHUB_TOKEN="" \
     versca
 ```
 
