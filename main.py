@@ -8,7 +8,7 @@ from src.bot import Bot
 from src.utils.environment import Environment
 from src.utils.logger import get_logger
 
-from src.helpers import yaml_helper, file_manager
+from src.helpers import yaml_helper, file_manager, string_parser
 
 logger = get_logger(__name__)
 
@@ -27,6 +27,7 @@ def run_scirpt():
 
         for key, val in data.items():
             logger.info('Run version scan for %s', key)
+            version_prefix = ''
             version_upgrade = False
             chart_version_upgrade = False
             oss_version = oss.check_version(repo=val['github'])
@@ -37,11 +38,14 @@ def run_scirpt():
             if 'version' in val:
                 for version in val['version']:
                     local_version = yaml_helper.read_yaml_path(tool=key, file_path=version['file'], yaml_path=version['yamlPath'])
+                    suffixed_version = yaml_helper.read_yaml_path(tool=key, file_path=version['file'], yaml_path=version['yamlPath'], helper=True)
+                    if suffixed_version != '':
+                        version_prefix = string_parser.non_version_pattern_parser(version=suffixed_version)
                     logger.info('Comparing version for %s: %s (local) | %s (public)', key, local_version, oss_version)
                     if oss_version != local_version:
                         version_upgrade = True
                         logger.info('Version upgrade detected: %s | %s => %s', key, local_version, oss_version)
-                        yaml_helper.update_yaml_version(tool=key, file_path=version['file'], yaml_path=version['yamlPath'], new_version=oss_version)
+                        yaml_helper.update_yaml_version(tool=key, file_path=version['file'], yaml_path=version['yamlPath'], new_version=oss_version, prefix=version_prefix)
 
             if 'chart' in val:
                 for chart_version in val['chart']:
@@ -53,6 +57,7 @@ def run_scirpt():
                         yaml_helper.update_yaml_version(tool=key, file_path=chart_version['file'], yaml_path=chart_version['yamlPath'], new_version=chart_oss_version)
 
             if val['autoMR']['enabled'] and version_upgrade:
+                delete_src_branch = False if 'deleteBranch' not in val['autoMR'] else val['autoMR']['deleteBranch']
                 release_notes = oss.get_release_notes(repo=val['github'])
                 branch = repo_manager.push_to_feature_branch(tool=key, old_version=local_version, new_version=oss_version)
                 project_id = val['autoMR']['projectId'] if val['autoMR']['projectId'] else ''
@@ -72,6 +77,7 @@ def run_scirpt():
                 )
 
             if val['autoMR']['enabled'] and chart_version_upgrade:
+                delete_src_branch = False if 'deleteBranch' not in val['autoMR'] else val['autoMR']['deleteBranch']
                 release_notes = oss.get_release_notes(repo=val['github'])
                 branch = repo_manager.push_to_feature_branch(tool=key, old_version=chart_local_version, new_version=chart_oss_version)
                 project_id = val['autoMR']['projectId'] if val['autoMR']['projectId'] else ''

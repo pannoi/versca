@@ -5,6 +5,8 @@ import ruamel.yaml
 from src.utils.logger import get_logger
 from src.utils.errors import YamlConvertError, YamlPathDepthError, YamlReadFileError, YamlUpdateFileError, YamlReadVersionError
 
+from src.helpers import string_parser
+
 logger = get_logger(__name__)
 
 def yaml_to_dict(file_path: str) -> dict:
@@ -27,7 +29,7 @@ def yaml_to_dict(file_path: str) -> dict:
             logger.error(err)
             raise YamlConvertError()
 
-def read_yaml_path(tool: str, file_path: str, yaml_path: str) -> str:
+def read_yaml_path(tool: str, file_path: str, yaml_path: str, helper: bool = False) -> str:
     """
     Read YAML version based on provided path
 
@@ -35,6 +37,7 @@ def read_yaml_path(tool: str, file_path: str, yaml_path: str) -> str:
         tool(str): Name of tool to specify as folder in path
         file_path(str): File path to lookup in tool directory
         yaml_path(str): Provided yaml path to read version
+        helper(bool): If true returns version with prefixes and suffixes (Default: False)
     Returns:
         str: Found current version of application
     Raises:
@@ -61,17 +64,17 @@ def read_yaml_path(tool: str, file_path: str, yaml_path: str) -> str:
             elif type(version) is list:
                 version = version[int(list_idx)][yaml_path[path_counter]]
             else:
-                logger.error('Not supported type in yaml path (only str/list): %s', str(type(version)))
-                raise ValueError('Not supported type in yaml path (only str/list): %s', str(type(version)))
+                logger.error('Not supported type in yaml path (only dict/list): %s', str(type(version)))
+                raise ValueError('Not supported type in yaml path (only dict/list): %s', str(type(version)))
         path_counter += 1
 
     if not str(version):
         logger.error('Cannot find version in provided YAML path: %s', yaml_path)
         raise YamlReadVersionError
 
-    return str(version)
+    return str(version) if helper else str(string_parser.version_pattern_parser(version=version))
 
-def update_yaml_version(tool: str, file_path: str, yaml_path: str, new_version: str) -> None:
+def update_yaml_version(tool: str, file_path: str, yaml_path: str, new_version: str, prefix: str = '') -> None:
     """
     Update YAML version based on provided path
 
@@ -80,6 +83,7 @@ def update_yaml_version(tool: str, file_path: str, yaml_path: str, new_version: 
         file_path(str): File path to lookup in tool directory
         yaml_path(str): Provided YAML path to update
         new_version(str): New version to which update yaml_path
+        prefix(str): If any prefix should be added before version, usualy docker image (Default: '')
     Raises:
         YamlReadFileError: Raises when unable to read YAML file
         YamlPathDepthError: Raises when yaml nested depth more than 5
@@ -101,7 +105,7 @@ def update_yaml_version(tool: str, file_path: str, yaml_path: str, new_version: 
 
     yaml_path = yaml_path.split('.')
 
-    upd = {yaml_path[-1]: new_version}
+    upd = {yaml_path[-1]: prefix + new_version}
 
     if len(yaml_path) == 1:
         config.update(upd)
@@ -125,8 +129,18 @@ def update_yaml_version(tool: str, file_path: str, yaml_path: str, new_version: 
             config[yaml_path[0]][yaml_path[1]][yaml_path[2]][yaml_path[3]][int(list_idx)].update(upd)
         else:
             config[yaml_path[0]][yaml_path[1]][yaml_path[2]][yaml_path[3]].update(upd)
+    elif len(yaml_path) == 6:
+        if list_idx:
+            config[yaml_path[0]][yaml_path[1]][yaml_path[2]][yaml_path[3]][yaml_path[4]][int(list_idx)].update(upd)
+        else:
+            config[yaml_path[0]][yaml_path[1]][yaml_path[2]][yaml_path[3]][yaml_path[4]].update(upd)
+    elif len(yaml_path) == 7:
+        if list_idx:
+            config[yaml_path[0]][yaml_path[1]][yaml_path[2]][yaml_path[3]][yaml_path[4]][yaml_path[5]][int(list_idx)].update(upd)
+        else:
+            config[yaml_path[0]][yaml_path[1]][yaml_path[2]][yaml_path[3]][yaml_path[4]][yaml_path[5]].update(upd)
     else:
-        logger.error('Depth more than 6 nests is not supported')
+        logger.error('Depth more than 7 nests is not supported')
         raise YamlPathDepthError(depth=len(yaml_path))
 
     try:

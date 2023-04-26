@@ -18,7 +18,8 @@ class Bot():
                              dest_branch: str,
                              old_version: str,
                              new_version: str,
-                             notes: str) -> str:
+                             notes: str,
+                             delete_src_branch: bool) -> str:
         """
         Call propper MR creationg method in class based on repo url
 
@@ -33,6 +34,7 @@ class Bot():
             old_version(str): Old version which was detected in local repository
             new_version(str): New version which was scrapped from OSS project
             notes(str): Release notes from OSS project
+            delete_src_branch(bool): if True src branch checkbox would be enabled, else disabled
         Returns:
             str: Generated Merge Request url after webhook
         Raises:
@@ -46,7 +48,8 @@ class Bot():
                 src_branch=src_branch,
                 dest_branch=dest_branch,
                 mr_title=mr_title,
-                notes=notes
+                notes=notes,
+                delete_src_branch=delete_src_branch
             )
         elif 'github' in repo:
             return self.create_github_pr(
@@ -64,7 +67,8 @@ class Bot():
                 mr_title=mr_title,
                 src_branch=src_branch,
                 dest_branch=dest_branch,
-                notes=notes
+                notes=notes,
+                delete_src_branch=delete_src_branch
             )
         else:
             logger.error('%s auto MR/PR not supported', repo)
@@ -75,7 +79,8 @@ class Bot():
                          dest_branch: str,
                          src_branch: str,
                          mr_title: str,
-                         notes: str) -> str:
+                         notes: str,
+                         delete_src_branch: bool) -> str:
         """
         Method to create Merge Request in Gitlab
 
@@ -85,6 +90,7 @@ class Bot():
             src_branch(str): Source branch which to merge
             mr_title(str): Merge Request title
             notes(str): Release notes from OSS project
+            delete_src_branch(bool): if True src branch checkbox would be enabled, else disabled
         Returns:
             str: Generated Merge Request url after webhook
         Raises:
@@ -98,7 +104,8 @@ class Bot():
             'source_branch': src_branch,
             'target_branch': dest_branch,
             'title': mr_title,
-            'description': notes
+            'description': notes,
+            'remove_source_branch': delete_src_branch
         }
 
         response = requests.post(url=url, json=payload, headers=headers, timeout=60)
@@ -158,7 +165,14 @@ class Bot():
         logger.info('Pull request in github was created: %s', mr_title)
         return response.json()['html_url']
 
-    def create_bitbucket_pr(self, owner: str, repo_name: str, mr_title: str, src_branch: str, dest_branch: str, notes: str) -> str:
+    def create_bitbucket_pr(self,
+                         owner: str,
+                         repo_name: str,
+                         dest_branch: str,
+                         src_branch: str,
+                         mr_title: str,
+                         notes: str,
+                         delete_src_branch: bool) -> str:
         """
         Method to create Pull Request in Bitbucket
 
@@ -169,6 +183,7 @@ class Bot():
             src_branch(str): Source branch which to merge
             mr_title(str): Pull Request title
             notes(str): Release notes from OSS project
+            delete_src_branch(bool): if True src branch checkbox would be enabled, else disabled
         Returns:
             str: Generated Pull Request url after webhook
         Raises:
@@ -181,6 +196,7 @@ class Bot():
         payload = {
             'title': mr_title,
             'description': notes,
+            'close_source_branch': delete_src_branch,
             'destination': {
                 'branch': {
                     'name': dest_branch
