@@ -8,7 +8,7 @@ from src.bot import Bot
 from src.utils.environment import Environment
 from src.utils.logger import get_logger
 
-from src.helpers import yaml_helper, file_manager
+from src.helpers import yaml_helper, file_manager, string_parser
 
 logger = get_logger(__name__)
 
@@ -27,6 +27,7 @@ def run_scirpt():
 
         for key, val in data.items():
             logger.info('Run version scan for %s', key)
+            version_prefix = ''
             version_upgrade = False
             chart_version_upgrade = False
             oss_version = oss.check_version(repo=val['github'])
@@ -37,11 +38,14 @@ def run_scirpt():
             if 'version' in val:
                 for version in val['version']:
                     local_version = yaml_helper.read_yaml_path(tool=key, file_path=version['file'], yaml_path=version['yamlPath'])
+                    suffixed_version = yaml_helper.read_yaml_path(tool=key, file_path=version['file'], yaml_path=version['yamlPath'], helper=True)
+                    if suffixed_version != '':
+                        version_prefix = string_parser.non_version_pattern_parser(version=suffixed_version)
                     logger.info('Comparing version for %s: %s (local) | %s (public)', key, local_version, oss_version)
                     if oss_version != local_version:
                         version_upgrade = True
                         logger.info('Version upgrade detected: %s | %s => %s', key, local_version, oss_version)
-                        yaml_helper.update_yaml_version(tool=key, file_path=version['file'], yaml_path=version['yamlPath'], new_version=oss_version)
+                        yaml_helper.update_yaml_version(tool=key, file_path=version['file'], yaml_path=version['yamlPath'], new_version=oss_version, prefix=version_prefix)
 
             if 'chart' in val:
                 for chart_version in val['chart']:
