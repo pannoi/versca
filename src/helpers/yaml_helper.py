@@ -140,7 +140,7 @@ def update_yaml_version(tool: str, file_path: str, yaml_path: str, new_version: 
         else:
             config[yaml_path[0]][yaml_path[1]][yaml_path[2]][yaml_path[3]][yaml_path[4]][yaml_path[5]].update(upd)
     else:
-        logger.error('Depth more than 6 nests is not supported')
+        logger.error('Depth more than 7 nests is not supported')
         raise YamlPathDepthError(depth=len(yaml_path))
 
     try:

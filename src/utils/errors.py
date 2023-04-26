@@ -8,7 +8,7 @@ class YamlConvertError(Exception):
     
 class YamlPathDepthError(Exception):
     """ To deep yaml path. """
-    def __init__(self, depth: int,message: str="Yaml depth more than 5 nests is not supported, provided: ") -> None:
+    def __init__(self, depth: int,message: str="Yaml depth more than 7 nests is not supported, provided: ") -> None:
         self.message = message
         self.depth = depth
         super().__init__(self.message)
