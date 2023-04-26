@@ -3,8 +3,10 @@
 ## [0.2.2] - 2023-04-27
 
 ### Added
+  - Bot parameter to delete src branch after merge
 
 ### Changed
+  - Support for version with prefixes (F.E. Docker images)
 
 ### Fixed
   - Fix logging comments to proper datatypes
