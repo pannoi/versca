@@ -7,6 +7,7 @@
 
 ### Changed
   - Support for version with prefixes (F.E. Docker images)
+  - Increase yaml path max depth from 5 to 7
 
 ### Fixed
   - Fix logging comments to proper datatypes
