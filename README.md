@@ -27,6 +27,7 @@ prometheus: # Tool name
   autoMR:
     enabled: true # Automatically create MR to masterBranch if new version is detected
     masterBranch: main # To which branch create MR/PR if new version is detected
+    deleteBranch: true # Optional, set `true` if you'd like to delete src branch after merge (If not set => false)
     projectId: 00000000 # Mandatory for gitlab (Gitlab projectId)
     repoName: prometheus # Mandatory for github/bitbucket (repository name)
     owner: pannoi # Mandatory for github/bitbucket (Owner name: usually organisation)
@@ -50,6 +51,7 @@ mimir:
   autoMR:
     enabled: true # Automatically create MR to masterBranch if new version is detected
     masterBranch: main # To which branch create MR/PR if new version is detected
+    deleteBranch: false # Optional, set `true` if you'd like to delete src branch after merge (If not set => false)
     projectId: 00000000 # Mandatory for gitlab
     repoName: mimir # Mandatory for github/bitbucket (repository name)
     owner: pannoi # Mandatory for github/bitbucket (Owner name: usually organisation)
