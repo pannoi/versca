@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.2.3] - 2023-05-10
+
+### Added
+  - Slack notification on fail
+
+### Changed
+
+### Fixed
+  - Keep scanning, if one tool scan failed
+  - Check if slack/autoMR are defined in configuration
+  - Delete src branch usage
+
 ## [0.2.2] - 2023-04-27
 
 ### Added

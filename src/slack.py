@@ -12,20 +12,22 @@ class Slack():
     """ Class to send messages to slack. """
     def __init__(self) -> None:
         self.url = Environment.slack_webhook_url
-        self.title = 'Version check done'
+        self.title = 'Version scan result'
 
     def send_message(self,
+                     ok: bool,
                      tool: str,
                      old_version: str,
                      new_version: str,
                      people: list,
                      auto_mr: bool,
-                     mr_url: str,
-                     notes: str) -> None:
+                     mr_url: str = "",
+                     notes: str = "") -> None:
         """
         Sends message to slack channel provided in env:SLACK_WEBHOOK_URL
 
         Parameters:
+            ok(bool): Status of message (succeed/failed)
             tool(str): Name of tool which was checked
             old_version(str): Old version which was declared in local repository
             new_version(str): New version which is available in Github
@@ -40,7 +42,8 @@ class Slack():
             logger.error("SLACK_WEBHOOK_URL env variable not set")
             raise SlackWebhookUrlNotSet
 
-        color = "#36a64f"
+        status = 'succeed' if ok == True else 'failed'
+        color = '#36A64F' if status == 'succeed' else '#FF462C'
         message = f'Goind to upgrade {tool} version: {old_version} => {new_version}'
 
         if auto_mr:
@@ -59,7 +62,7 @@ class Slack():
                 {
                 "mrkdwn_in": ["text"],
                     "color": color,
-                    "title": self.title,
+                    "title": f'{self.title}: {status.capitalize()}',
                     "text": message,
                 }
             ]
@@ -69,7 +72,7 @@ class Slack():
         headers = {'Content-Type': "application/json", 'Content-Length': byte_length}
         response = requests.post(self.url, data=json.dumps(slack_payload), headers=headers, timeout=120)
         if not response.ok:
-            logger.error('Failed to send message to slack')
+            logger.error('Failed to send message to slack for %s', tool)
             logger.error(response.json())
             raise SlackFailedSendMessage(text=response.text)
-        logger.info('Slack message was sent')
+        logger.info('Slack message was sent for %s', tool)
