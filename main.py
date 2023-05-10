@@ -73,7 +73,8 @@ def run_scirpt():
                     dest_branch=val['autoMR']['masterBranch'],
                     old_version=local_version,
                     new_version=oss_version,
-                    notes=release_notes
+                    notes=release_notes,
+                    delete_src_branch=delete_src_branch
                 )
 
             if val['autoMR']['enabled'] and chart_version_upgrade:
@@ -93,7 +94,8 @@ def run_scirpt():
                     dest_branch=val['autoMR']['masterBranch'],
                     old_version=chart_local_version,
                     new_version=chart_oss_version,
-                    notes=release_notes
+                    notes=release_notes,
+                    delete_src_branch=delete_src_branch
                 )
 
             if val['slack']['enabled'] and version_upgrade:
