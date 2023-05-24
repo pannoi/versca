@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.2.4] - 2023-05-10
+
+### Added
+  - Scan tags if there are not releases in OSS
+
+### Changed
+
+### Fixed
+  - Support `v` prefix with suffix in release version
+  - Store in local_path, not in tool_name
+
 ## [0.2.3] - 2023-05-10
 
 ### Added
