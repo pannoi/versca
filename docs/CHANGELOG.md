@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.2.4] - 2023-05-10
+## [0.2.4] - 2023-05-24
 
 ### Added
   - Scan tags if there are not releases in OSS
