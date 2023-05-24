@@ -9,6 +9,8 @@ def version_pattern_parser(version: str) -> str:
     Rerturns:
         str: Cutted stirng which is matching pattern: 0.0.0
     """
+    version = version.replace('v', '') if 'v' in version else version
+
     version_pattern = re.compile(r"\d+\.\d+\.\d+")
     deletion_pattern = re.sub(version_pattern, '', version)
 
