@@ -26,7 +26,7 @@ class RepoManager():
         local_path = f'{os.getcwd()}/{tool}'
 
         try:
-            git.Git(local_path).clone(repo_url)
+            git.Git(local_path).clone(repo_url, local_path)
             logger.info('Repo was cloned to %s', local_path)
         except Exception as err:
             logger.error('Failed to clone repo %s', repo_url)
