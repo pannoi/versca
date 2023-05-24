@@ -67,6 +67,14 @@ class OSS():
         url = f'https://api.github.com/repos/{repo}/contents/{chart}'
 
         response = requests.get(url=url, headers=self.headers, timeout=120)
+
+        if response.status_code == 404:
+            url = f'https://api.github.com/repos/{repo}/tags'
+            response = requests.get(url=url, headers=self.headers, timeout=120)
+            version = response.json()[0]['name']
+        else:
+            version = response.json()['name'] if response.json()['name'] is not None else response.json()['tag_name']
+
         if not response.ok:
             logger.error('Failed to requests chart content from %s', url)
             logger.error(response.json())
@@ -102,6 +110,11 @@ class OSS():
         url = f'https://api.github.com/repos/{repo}/releases/latest'
 
         response = requests.get(url=url, headers=self.headers, timeout=120)
+
+        if response.status_code == 404:
+            logger.warn('Release notes are missing for %s', repo)
+            return ''
+
         if not response.ok:
             logger.error('Failed to request version from %s', url)
             logger.error(response.json())
